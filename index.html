@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOS Stories – Prototype</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-deep:   #1a0a3c;
+      --purple-mid:    #2d1a6e;
+      --purple-ui:     #4a2fa0;
+      --purple-light:  #7b5fd4;
+      --accent-pink:   #e040a0;
+      --accent-coral:  #ff6b6b;
+      --white:         #ffffff;
+      --white-60:      rgba(255,255,255,.6);
+      --white-20:      rgba(255,255,255,.12);
+      --radius:        12px;
+      --radius-lg:     20px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--purple-deep);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── TOP BAR ─────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 28px;
+      background: rgba(26,10,60,.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--white-20);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -.4px;
+      white-space: nowrap;
+    }
+    .logo-box {
+      background: var(--white);
+      color: var(--purple-deep);
+      font-weight: 900;
+      padding: 3px 7px;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+    .logo-box span { color: #e8001d; }
+
+    .search-wrap {
+      flex: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 48px 10px 18px;
+      border-radius: 50px;
+      border: none;
+      background: var(--white-20);
+      color: var(--white);
+      font-size: 14px;
+      outline: none;
+    }
+    .search-wrap input::placeholder { color: var(--white-60); }
+    .search-btn {
+      position: absolute;
+      right: 4px; top: 50%;
+      transform: translateY(-50%);
+      background: var(--purple-ui);
+      border: none; border-radius: 50px;
+      color: var(--white);
+      font-size: 13px;
+      padding: 7px 16px;
+      cursor: pointer;
+    }
+
+    .social-icons { display: flex; gap: 10px; margin-left: auto; }
+    .social-icons a {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--white-20);
+      display: grid; place-items: center;
+      color: var(--white); text-decoration: none;
+      font-size: 15px;
+      transition: background .2s;
+    }
+    .social-icons a:hover { background: var(--purple-ui); }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      width: 100%; height: 220px;
+      overflow: hidden;
+    }
+    .hero img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: brightness(.45);
+    }
+    .hero-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, var(--purple-deep));
+    }
+
+    /* ── MAIN LAYOUT ─────────────────────────────────── */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+      max-width: 1200px;
+      margin: -60px auto 0;
+      padding: 0 28px 60px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ── VIDEO COLUMN ────────────────────────────────── */
+    .video-col { display: flex; flex-direction: column; gap: 0; }
+
+    /* player wrapper */
+    .player-wrap {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 16/9;
+      cursor: pointer;
+    }
+
+    .player-thumb {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(.75);
+    }
+
+    /* play / pause overlay */
+    .play-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+    .play-circle {
+      width: 64px; height: 64px;
+      background: rgba(0,0,0,.55);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      backdrop-filter: blur(4px);
+    }
+    .play-circle svg { width: 28px; height: 28px; fill: white; }
+
+    /* player controls bar */
+    .controls {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 24px 14px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,.75));
+    }
+
+    /* scrub bar */
+    .scrub-area {
+      position: relative;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .track-bg {
+      position: absolute;
+      left: 0; right: 0;
+      height: 4px;
+      background: rgba(255,255,255,.25);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .track-fill {
+      height: 100%;
+      background: var(--accent-pink);
+      border-radius: 4px;
+      transition: width .05s linear;
+    }
+
+    /* playhead thumb */
+    .scrub-thumb {
+      position: absolute;
+      width: 14px; height: 14px;
+      background: var(--white);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      top: 50%; margin-top: -7px;
+      pointer-events: none;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.3);
+      transition: left .05s linear;
+    }
+
+    /* claim dots */
+    .claim-dot {
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 2px solid var(--purple-deep);
+      transform: translateX(-50%);
+      top: 50%; margin-top: -7px;
+      cursor: pointer;
+      transition: transform .15s, background .15s, box-shadow .15s;
+      z-index: 2;
+    }
+    .claim-dot:hover,
+    .claim-dot.active {
+      transform: translateX(-50%) scale(1.4);
+      background: #fadf4b;
+      box-shadow: 0 0 0 4px rgba(250,223,75,.35);
+    }
+    .claim-dot.active { background: #fadf4b; }
+
+    /* dot tooltip on hover */
+    .claim-dot::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--purple-deep);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--white-20);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s;
+    }
+    .claim-dot:hover::after { opacity: 1; }
+
+    /* time display */
+    .time-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .time-left { display: flex; align-items: center; gap: 10px; }
+
+    .btn-icon {
+      background: none; border: none;
+      color: var(--white);
+      cursor: pointer;
+      padding: 4px;
+      display: grid; place-items: center;
+      opacity: .9;
+      transition: opacity .15s;
+    }
+    .btn-icon:hover { opacity: 1; }
+    .btn-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .timestamp {
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      opacity: .85;
+    }
+
+    .btn-fullscreen {
+      background: none; border: none;
+      color: var(--white);
+      cursor: pointer;
+      opacity: .85;
+      transition: opacity .15s;
+    }
+    .btn-fullscreen:hover { opacity: 1; }
+    .btn-fullscreen svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* top-right player icons */
+    .player-top {
+      position: absolute;
+      top: 12px; right: 12px;
+      display: flex; gap: 8px;
+    }
+    .player-top button {
+      width: 34px; height: 34px;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      border: none; border-radius: 8px;
+      color: white; cursor: pointer;
+      display: grid; place-items: center;
+      transition: background .15s;
+    }
+    .player-top button:hover { background: rgba(0,0,0,.7); }
+    .player-top button svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ── SOURCE CARD ─────────────────────────────────── */
+    .source-panel {
+      margin-top: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s;
+      opacity: 0;
+    }
+    .source-panel.visible {
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    .source-card {
+      background: var(--purple-mid);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: 20px;
+      border-top: 2px solid #fadf4b;
+      position: relative;
+    }
+
+    .source-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .claim-badge {
+      background: #fadf4b;
+      color: var(--purple-deep);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 4px 10px;
+      border-radius: 50px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .source-claim {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .source-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .source-item {
+      background: rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding: 14px;
+      border: 1px solid var(--white-20);
+      transition: border-color .2s, background .2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .source-item:hover {
+      background: rgba(255,255,255,.14);
+      border-color: rgba(250,223,75,.5);
+    }
+
+    .source-type {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--white-60);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .source-type-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .source-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .source-meta {
+      font-size: 11px;
+      color: var(--white-60);
+    }
+
+    .source-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: var(--white-20);
+      border: none;
+      color: var(--white);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: grid; place-items: center;
+      line-height: 1;
+      transition: background .15s;
+    }
+    .source-close:hover { background: rgba(255,255,255,.25); }
+
+    /* explanation bar between player and source */
+    .explain-bar {
+      background: rgba(250,223,75,.12);
+      border: 1px solid rgba(250,223,75,.3);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #fadf4b;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .explain-bar svg { width: 16px; height: 16px; fill: #fadf4b; flex-shrink: 0; }
+
+    /* ── RIGHT COLUMN ────────────────────────────────── */
+    .info-col { padding-top: 8px; }
+
+    .article-category {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--white-60);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .article-title {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -.3px;
+    }
+
+    .article-body {
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255,255,255,.82);
+      margin-bottom: 24px;
+    }
+
+    .cta-row { display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--purple-ui);
+      color: var(--white);
+      padding: 12px 22px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      border: none; cursor: pointer;
+      transition: background .2s, transform .1s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--purple-light); transform: translateY(-1px); }
+    .btn-primary svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .next-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--white-60);
+      margin-bottom: 10px;
+    }
+
+    .next-card {
+      display: flex;
+      gap: 12px;
+      background: rgba(255,255,255,.07);
+      border-radius: var(--radius);
+      padding: 12px;
+      cursor: pointer;
+      border: 1px solid var(--white-20);
+      transition: background .2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .next-card:hover { background: rgba(255,255,255,.12); }
+    .next-thumb {
+      width: 80px; height: 56px;
+      border-radius: 8px;
+      background: var(--purple-ui);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: grid; place-items: center;
+    }
+    .next-thumb svg { width: 22px; height: 22px; fill: rgba(255,255,255,.5); }
+    .next-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      align-self: center;
+    }
+
+    /* ── STAR DECO ───────────────────────────────────── */
+    .star-deco {
+      position: fixed;
+      bottom: 60px; right: 40px;
+      opacity: .18;
+      pointer-events: none;
+      animation: spin 40s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOOLTIP ─────────────────────────────────────── */
+    .scrub-tooltip {
+      position: absolute;
+      bottom: 28px;
+      background: rgba(26,10,60,.95);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: 7px;
+      border: 1px solid var(--white-20);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(-50%);
+      transition: opacity .1s;
+      z-index: 10;
+    }
+    .scrub-area:hover .scrub-tooltip { opacity: 1; }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 860px) {
+      .main { grid-template-columns: 1fr; gap: 20px; margin-top: -30px; }
+      .social-icons { display: none; }
+      .article-title { font-size: 20px; }
+      .source-body { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-box"><span>NOS</span></div>
+    stories
+  </div>
+  <div class="search-wrap">
+    <input type="text" placeholder="Zoek in Stories…" />
+    <button class="search-btn">Zoeken</button>
+  </div>
+  <div class="social-icons">
+    <a href="#" title="YouTube">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+    </a>
+    <a href="#" title="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+    </a>
+    <a href="#" title="Instagram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1400&q=60" alt="" />
+  <div class="hero-gradient"></div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- VIDEO + SOURCE COLUMN -->
+  <div class="video-col">
+
+    <!-- PLAYER -->
+    <div class="player-wrap" id="playerWrap">
+
+      <!-- thumbnail / video frame -->
+      <img class="player-thumb"
+           src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=900&q=70"
+           alt="Video thumbnail" />
+
+      <!-- play / pause overlay -->
+      <div class="play-overlay" id="playOverlay">
+        <div class="play-circle" id="playCircle">
+          <!-- play icon -->
+          <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <!-- pause icon (hidden) -->
+          <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </div>
+      </div>
+
+      <!-- top-right controls -->
+      <div class="player-top">
+        <button title="Kwaliteit">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </button>
+        <button title="Ondertiteling">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h2v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"/></svg>
+        </button>
+        <button title="Volume">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls" id="controls">
+
+        <!-- SCRUB BAR -->
+        <div class="scrub-area" id="scrubArea">
+          <!-- track -->
+          <div class="track-bg">
+            <div class="track-fill" id="trackFill" style="width:33%"></div>
+          </div>
+          <!-- playhead -->
+          <div class="scrub-thumb" id="scrubThumb" style="left:33%"></div>
+          <!-- hover tooltip -->
+          <div class="scrub-tooltip" id="scrubTooltip">0:00</div>
+
+          <!-- CLAIM DOTS – data-pos = % along bar, data-id = claim index -->
+          <div class="claim-dot" data-pos="14" data-id="0" data-label="Duizenden klachten"></div>
+          <div class="claim-dot" data-pos="34" data-id="1" data-label="Trump's onjuiste bewering" style="background:#fadf4b;box-shadow:0 0 0 4px rgba(250,223,75,.35);transform:translateX(-50%) scale(1.4)"></div>
+          <div class="claim-dot" data-pos="55" data-id="2" data-label="Torenhoge kosten"></div>
+          <div class="claim-dot" data-pos="70" data-id="3" data-label="Late diagnose"></div>
+          <div class="claim-dot" data-pos="88" data-id="4" data-label="Advertenties op socials"></div>
+        </div>
+
+        <!-- TIME ROW -->
+        <div class="time-row">
+          <div class="time-left">
+            <button class="btn-icon" id="playBtn" title="Afspelen/Pauzeren">
+              <svg id="ctrlPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="ctrlPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <span class="timestamp" id="timestamp">3:34 / 10:42</span>
+          </div>
+          <button class="btn-fullscreen" title="Volledig scherm">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div><!-- /player-wrap -->
+
+    <!-- EXPLAIN BAR -->
+    <div class="explain-bar">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <span>Klik op een <strong style="color:#fadf4b">stip</strong> in de tijdlijn om te zien welke bronnen NOS gebruikt voor die uitspraak.</span>
+    </div>
+
+    <!-- SOURCE PANEL -->
+    <div class="source-panel" id="sourcePanel">
+      <div class="source-card" id="sourceCard">
+        <button class="source-close" id="sourceClose" title="Sluiten">×</button>
+        <div class="source-header">
+          <span class="claim-badge" id="claimBadge">Bewering</span>
+          <p class="source-claim" id="claimText"></p>
+        </div>
+        <div class="source-body" id="sourceBody"></div>
+      </div>
+    </div>
+
+  </div><!-- /video-col -->
+
+  <!-- INFO COLUMN -->
+  <div class="info-col">
+    <div class="article-category">
+      <span>Onderzoek</span>
+      <span>•</span>
+      <span>8 augustus</span>
+      <span>•</span>
+      <span>▶ 10:42</span>
+    </div>
+
+    <h1 class="article-title">Artsen in shock: meiden voor HEFTIGE buikoperaties naar Spanje</h1>
+
+    <p class="article-body">
+      Jonge meiden die soms al jaren niks kunnen eten en zich niet gehoord voelen door artsen in Nederland.
+      Sommigen zoeken hulp in het buitenland, voor onderzoeken en heftige operaties betalen ze tienduizenden euro's.
+      Hoe kan het zó ver komen? Wij zochten het uit met onze collega's van Nieuwsuur.
+    </p>
+
+    <div class="cta-row">
+      <a href="#" class="btn-primary">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Lees meer
+      </a>
+      <button class="btn-primary" onclick="navigator.share && navigator.share({title:'NOS Stories', url: location.href})">
+        <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+        Link delen
+      </button>
+    </div>
+
+    <p class="next-label">Volgende video</p>
+    <a href="#" class="next-card">
+      <div class="next-thumb">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <span class="next-title">Hoe deze VLIEGR AMP heel veel levens VERWOESTTE | Rewind…</span>
+    </a>
+  </div>
+
+</main>
+
+<!-- STAR DECORATION -->
+<svg class="star-deco" width="120" height="120" viewBox="0 0 120 120" fill="none">
+  <path d="M60 5 L63 55 L113 60 L63 65 L60 115 L57 65 L7 60 L57 55 Z" fill="white"/>
+  <path d="M60 25 L62 58 L95 60 L62 62 L60 95 L58 62 L25 60 L58 58 Z" fill="white" opacity=".5"/>
+</svg>
+
+<script>
+  /* ── DATA ──────────────────────────────────────────────── */
+  const CLAIMS = [
+    {
+      time: "1:29",
+      pos: 14,
+      text: "Jaarlijks melden zich duizenden jonge vrouwen bij de huisarts met chronische buikklachten die niet verklaard kunnen worden.",
+      sources: [
+        {
+          type: "Wetenschappelijk onderzoek",
+          color: "#4fc3f7",
+          title: "Functionele buikpijnklachten bij adolescenten in Nederland",
+          meta: "NWO / Amsterdam UMC, 2022 — gepubliceerd in Gut",
+          url: "#"
+        },
+        {
+          type: "Statistieken",
+          color: "#81c784",
+          title: "Zorgregistraties eerste lijn: maag-darmklachten jongeren 2018–2023",
+          meta: "NIVEL Zorgregistraties, 2023",
+          url: "#"
+        }
+      ]
+    },
+    {
+      time: "3:34",
+      pos: 34,
+      text: "Trump herhaalde de bewering dat scholen kinderen stiekem naar geslachtsbevestigende operaties sturen — dit is aantoonbaar onjuist.",
+      sources: [
+        {
+          type: "Factcheck",
+          color: "#ffb74d",
+          title: "Fact check: Trump revives his lie that schools are secretly sending children for gender-affirming surgeries",
+          meta: "CNN, augustus 2023",
+          url: "#"
+        },
+        {
+          type: "Officieel beleid",
+          color: "#f48fb1",
+          title: "WPATH Standards of Care v8 — vereiste ouderlijke toestemming",
+          meta: "World Professional Association for Transgender Health, 2022",
+          url: "#"
+        }
+      ]
+    },
+    {
+      time: "5:50",
+      pos: 55,
+      text: "De kosten voor een gastric sleeve-operatie in Spanje lopen op tot meer dan €15.000, zonder vergoeding van de Nederlandse zorgverzekering.",
+      sources: [
+        {
+          type: "Prijsvergelijking",
+          color: "#ce93d8",
+          title: "Vergelijking behandelkosten bariatrische chirurgie EU",
+          meta: "Zorginstituut Nederland, 2023",
+          url: "#"
+        },
+        {
+          type: "Getuigenis",
+          color: "#80cbc4",
+          title: "Interview drie patiënten — anoniem, geverifieerd door redactie",
+          meta: "NOS Nieuwsuur onderzoeksredactie, juli 2024",
+          url: "#"
+        }
+      ]
+    },
+    {
+      time: "7:14",
+      pos: 70,
+      text: "Artsen in Nederland schrijven gemiddeld pas na 4 jaar een diagnose uit bij jongeren met functionele gastro-intestinale aandoeningen.",
+      sources: [
+        {
+          type: "Medisch onderzoek",
+          color: "#4fc3f7",
+          title: "Diagnostic delay in pediatric functional GI disorders: a Dutch cohort study",
+          meta: "Erasmus MC / Maastricht UMC+, 2021",
+          url: "#"
+        },
+        {
+          type: "Expert interview",
+          color: "#a5d6a7",
+          title: "Dr. M. van den Berg (kinderarts MDL, MUMC+) — interview on record",
+          meta: "NOS redactie, april 2024",
+          url: "#"
+        }
+      ]
+    },
+    {
+      time: "9:21",
+      pos: 88,
+      text: "Ziekenhuizen in Spanje die zich richten op Nederlandse patiënten adverteren actief op sociale media gericht op tieners.",
+      sources: [
+        {
+          type: "Data-analyse",
+          color: "#ffb74d",
+          title: "Meta Advertentiebibliotheek: analyse 180+ advertenties bariatrische klinieken NL-doelgroep",
+          meta: "NOS Data team, mei 2024 — methode beschikbaar",
+          url: "#"
+        },
+        {
+          type: "Screenshots",
+          color: "#ef9a9a",
+          title: "Gearchiveerde advertenties — 23 screenshots bewaard via Wayback Machine",
+          meta: "NOS Stories redactie, 2024",
+          url: "#"
+        }
+      ]
+    }
+  ];
+
+  /* ── STATE ─────────────────────────────────────────────── */
+  let isPlaying = false;
+  let progressPct = 33;
+  let playInterval = null;
+  let activeClaim = 1; // start with claim at 34% active
+
+  /* ── REFS ──────────────────────────────────────────────── */
+  const trackFill    = document.getElementById('trackFill');
+  const scrubThumb   = document.getElementById('scrubThumb');
+  const timestamp    = document.getElementById('timestamp');
+  const playOverlay  = document.getElementById('playOverlay');
+  const iconPlay     = document.getElementById('iconPlay');
+  const iconPause    = document.getElementById('iconPause');
+  const ctrlPlay     = document.getElementById('ctrlPlay');
+  const ctrlPause    = document.getElementById('ctrlPause');
+  const sourcePanel  = document.getElementById('sourcePanel');
+  const claimText    = document.getElementById('claimText');
+  const claimBadge   = document.getElementById('claimBadge');
+  const sourceBody   = document.getElementById('sourceBody');
+  const sourceClose  = document.getElementById('sourceClose');
+  const scrubArea    = document.getElementById('scrubArea');
+  const scrubTooltip = document.getElementById('scrubTooltip');
+  const playBtn      = document.getElementById('playBtn');
+  const playerWrap   = document.getElementById('playerWrap');
+
+  const TOTAL_SECS   = 642; // 10:42
+
+  /* ── HELPERS ───────────────────────────────────────────── */
+  function pctToTime(pct) {
+    const s = Math.round((pct / 100) * TOTAL_SECS);
+    return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  }
+
+  function updateScrub(pct) {
+    progressPct = Math.max(0, Math.min(100, pct));
+    trackFill.style.width = progressPct + '%';
+    scrubThumb.style.left = progressPct + '%';
+    timestamp.textContent = `${pctToTime(progressPct)} / 10:42`;
+  }
+
+  function setPlaying(val) {
+    isPlaying = val;
+    iconPlay.style.display   = val ? 'none' : 'block';
+    iconPause.style.display  = val ? 'block' : 'none';
+    ctrlPlay.style.display   = val ? 'none' : 'block';
+    ctrlPause.style.display  = val ? 'block' : 'none';
+    playOverlay.style.opacity = val ? 0 : 1;
+
+    clearInterval(playInterval);
+    if (val) {
+      playInterval = setInterval(() => {
+        if (progressPct >= 100) { setPlaying(false); return; }
+        updateScrub(progressPct + 100/TOTAL_SECS);
+      }, 1000);
+    }
+  }
+
+  function showClaim(idx) {
+    if (idx === activeClaim) { closeSource(); return; }
+    activeClaim = idx;
+
+    // update dot styles
+    document.querySelectorAll('.claim-dot').forEach(d => {
+      const active = parseInt(d.dataset.id) === idx;
+      d.style.background = active ? '#fadf4b' : '';
+      d.style.boxShadow  = active ? '0 0 0 4px rgba(250,223,75,.35)' : '';
+      d.style.transform  = active ? 'translateX(-50%) scale(1.4)' : '';
+    });
+
+    const claim = CLAIMS[idx];
+    claimBadge.textContent = `Bewering @ ${claim.time}`;
+    claimText.textContent  = claim.text;
+
+    // build source items
+    sourceBody.innerHTML = claim.sources.map(s => `
+      <a class="source-item" href="${s.url}" target="_blank" rel="noopener">
+        <div class="source-type">
+          <div class="source-type-dot" style="background:${s.color}"></div>
+          ${s.type}
+        </div>
+        <div class="source-title">${s.title}</div>
+        <div class="source-meta">${s.meta}</div>
+      </a>
+    `).join('');
+
+    sourcePanel.classList.add('visible');
+
+    // scroll source into view on mobile
+    if (window.innerWidth <= 860) {
+      setTimeout(() => sourcePanel.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+    }
+  }
+
+  function closeSource() {
+    activeClaim = -1;
+    sourcePanel.classList.remove('visible');
+    document.querySelectorAll('.claim-dot').forEach(d => {
+      d.style.background = '';
+      d.style.boxShadow  = '';
+      d.style.transform  = '';
+    });
+  }
+
+  /* ── EVENTS ────────────────────────────────────────────── */
+
+  // play/pause
+  playerWrap.addEventListener('click', e => {
+    if (e.target.closest('.claim-dot') || e.target.closest('.controls')) return;
+    setPlaying(!isPlaying);
+  });
+  playBtn.addEventListener('click', () => setPlaying(!isPlaying));
+
+  // claim dots
+  document.querySelectorAll('.claim-dot').forEach(dot => {
+    dot.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = parseInt(dot.dataset.id);
+      const pos = parseFloat(dot.dataset.pos);
+      updateScrub(pos);
+      if (isPlaying) setPlaying(false);
+      showClaim(idx);
+    });
+  });
+
+  // place dots at correct positions
+  document.querySelectorAll('.claim-dot').forEach(dot => {
+    dot.style.left = dot.dataset.pos + '%';
+  });
+
+  // scrub bar click
+  scrubArea.addEventListener('click', e => {
+    const rect = scrubArea.getBoundingClientRect();
+    const pct  = ((e.clientX - rect.left) / rect.width) * 100;
+    updateScrub(pct);
+    if (isPlaying) setPlaying(false);
+  });
+
+  // scrub bar hover tooltip
+  scrubArea.addEventListener('mousemove', e => {
+    const rect = scrubArea.getBoundingClientRect();
+    const pct  = ((e.clientX - rect.left) / rect.width) * 100;
+    const clamped = Math.max(0, Math.min(100, pct));
+    scrubTooltip.style.left = clamped + '%';
+    scrubTooltip.textContent = pctToTime(clamped);
+  });
+
+  // close source panel
+  sourceClose.addEventListener('click', closeSource);
+
+  // keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === ' ') { e.preventDefault(); setPlaying(!isPlaying); }
+    if (e.key === 'Escape') closeSource();
+  });
+
+  /* ── INIT ──────────────────────────────────────────────── */
+  updateScrub(progressPct);
+  // show the second claim on load (matching the screenshot's active dot)
+  showClaim(1);
+</script>
+</body>
+</html>
