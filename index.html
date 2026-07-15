@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOS Stories – Prototype</title>
+  <title>NOS Stories: PoC bronvermelding</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -33,75 +33,55 @@
     .topbar {
       display: flex;
       align-items: center;
-      gap: 16px;
       padding: 14px 28px;
-      background: rgba(26,10,60,.85);
-      backdrop-filter: blur(12px);
+      background: rgba(26,10,60,.75);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 1px solid var(--white-20);
     }
-
-    .logo {
+    .logo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border-radius: 10px;
+      padding: 6px 12px 6px 6px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nos-badge {
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -.5px;
+      color: #fff;
+      line-height: 1;
+    }
+    .nos-badge .o { color: #e8001d; }
+    .stories-word {
+      font-size: 18px;
+      font-weight: 700;
+      color: rgba(255,255,255,.9);
+      letter-spacing: -.2px;
+    }
+    .topbar-right {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: -.4px;
-      white-space: nowrap;
+      margin-left: auto;
     }
-    .logo-box {
-      background: var(--white);
-      color: var(--purple-deep);
-      font-weight: 900;
-      padding: 3px 7px;
-      border-radius: 5px;
-      font-size: 15px;
-    }
-    .logo-box span { color: #e8001d; }
-
-    .search-wrap {
-      flex: 1;
-      max-width: 520px;
-      margin: 0 auto;
-      position: relative;
-    }
-    .search-wrap input {
-      width: 100%;
-      padding: 10px 48px 10px 18px;
-      border-radius: 50px;
-      border: none;
-      background: var(--white-20);
-      color: var(--white);
-      font-size: 14px;
-      outline: none;
-    }
-    .search-wrap input::placeholder { color: var(--white-60); }
-    .search-btn {
-      position: absolute;
-      right: 4px; top: 50%;
-      transform: translateY(-50%);
-      background: var(--purple-ui);
-      border: none; border-radius: 50px;
-      color: var(--white);
-      font-size: 13px;
-      padding: 7px 16px;
-      cursor: pointer;
-    }
-
-    .social-icons { display: flex; gap: 10px; margin-left: auto; }
-    .social-icons a {
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      background: var(--white-20);
+    .icon-btn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      border: none; cursor: pointer;
       display: grid; place-items: center;
-      color: var(--white); text-decoration: none;
-      font-size: 15px;
-      transition: background .2s;
+      color: var(--white);
+      transition: background .15s;
+      text-decoration: none;
     }
-    .social-icons a:hover { background: var(--purple-ui); }
+    .icon-btn:hover { background: rgba(255,255,255,.28); }
+    .icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
     /* ── HERO ────────────────────────────────────────── */
     .hero {
@@ -373,6 +353,9 @@
       text-decoration: none;
       color: inherit;
       display: block;
+      text-align: left;
+      font: inherit;
+      width: 100%;
     }
     .source-item:hover {
       background: rgba(255,255,255,.14);
@@ -537,7 +520,7 @@
     /* ── TOOLTIP ─────────────────────────────────────── */
     .scrub-tooltip {
       position: absolute;
-      bottom: 28px;
+      top: 28px;
       background: rgba(26,10,60,.95);
       color: var(--white);
       font-size: 11px;
@@ -548,11 +531,134 @@
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
-      transform: translateX(-50%);
+      transform: translateX(-100%);
       transition: opacity .1s;
       z-index: 10;
     }
     .scrub-area:hover .scrub-tooltip { opacity: 1; }
+
+    /* ── SOURCE DETAIL DRAWER ────────────────────────────── */
+    .source-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 4, 30, 0.72);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+    .source-drawer-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .source-drawer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--purple-mid);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 28px 28px 40px;
+      z-index: 201;
+      transform: translateY(100%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      border-top: 3px solid var(--drawer-accent, #fadf4b);
+    }
+    .source-drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer-handle {
+      width: 40px; height: 4px;
+      background: var(--white-20);
+      border-radius: 2px;
+      margin: 0 auto 24px;
+    }
+
+    .drawer-type-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .drawer-type-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .drawer-type-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--white-60);
+    }
+
+    .drawer-title {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .drawer-meta {
+      font-size: 12px;
+      color: var(--white-60);
+      margin-bottom: 22px;
+    }
+
+    .drawer-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--white-60);
+      margin-bottom: 7px;
+    }
+    .drawer-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255,255,255,.88);
+      margin-bottom: 20px;
+    }
+
+    .drawer-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .drawer-btn-open {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--purple-ui);
+      color: var(--white);
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none; cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .drawer-btn-open:hover { background: var(--purple-light); }
+    .drawer-btn-open svg { width: 15px; height: 15px; fill: currentColor; }
+
+    .drawer-btn-close {
+      background: var(--white-20);
+      color: var(--white);
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none; cursor: pointer;
+      transition: background .15s;
+    }
+    .drawer-btn-close:hover { background: rgba(255,255,255,.2); }
+
+    .source-item.selected {
+      border-color: rgba(250,223,75,.7);
+      background: rgba(250,223,75,.1);
+    }
 
     /* ── RESPONSIVE ──────────────────────────────────── */
     @media (max-width: 860px) {
@@ -567,23 +673,22 @@
 
 <!-- TOP BAR -->
 <header class="topbar">
-  <div class="logo">
-    <div class="logo-box"><span>NOS</span></div>
-    stories
-  </div>
-  <div class="search-wrap">
-    <input type="text" placeholder="Zoek in Stories…" />
-    <button class="search-btn">Zoeken</button>
-  </div>
-  <div class="social-icons">
-    <a href="#" title="YouTube">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+  <a class="logo-pill" href="#">
+    <span class="nos-badge">N<span class="o">O</span>S</span>
+    <span class="stories-word">stories</span>
+  </a>
+  <div class="topbar-right">
+    <button class="icon-btn" title="Zoeken">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    </button>
+    <a class="icon-btn" href="#" title="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
     </a>
-    <a href="#" title="TikTok">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+    <a class="icon-btn" href="#" title="TikTok">
+      <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
     </a>
-    <a href="#" title="Instagram">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    <a class="icon-btn" href="#" title="Instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
     </a>
   </div>
 </header>
@@ -673,7 +778,7 @@
     <!-- EXPLAIN BAR -->
     <div class="explain-bar">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      <span>Klik op een <strong style="color:#fadf4b">stip</strong> in de tijdlijn om te zien welke bronnen NOS gebruikt voor die uitspraak.</span>
+      <span>Klik op een <strong style="color:#fadf4b">stip</strong> in de tijdlijn om te zien welke bronnen NOS Stories heeft gebruikt voor die uitspraak.</span>
     </div>
 
     <!-- SOURCE PANEL -->
@@ -724,11 +829,34 @@
       <div class="next-thumb">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </div>
-      <span class="next-title">Hoe deze VLIEGR AMP heel veel levens VERWOESTTE | Rewind…</span>
+      <span class="next-title">Hoe deze VLIEGRAMP heel veel levens VERWOESTTE | Rewind…</span>
     </a>
   </div>
 
 </main>
+
+<!-- SOURCE DETAIL DRAWER -->
+<div class="source-drawer-overlay" id="drawerOverlay"></div>
+<div class="source-drawer" id="sourceDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-type-row">
+    <div class="drawer-type-dot" id="drawerDot"></div>
+    <span class="drawer-type-label" id="drawerType"></span>
+  </div>
+  <div class="drawer-title" id="drawerTitle"></div>
+  <div class="drawer-meta" id="drawerMeta"></div>
+  <div class="drawer-section-label">Wat bevat deze bron?</div>
+  <div class="drawer-text" id="drawerExplanation"></div>
+  <div class="drawer-section-label">Waarom is dit relevant?</div>
+  <div class="drawer-text" id="drawerRelevance"></div>
+  <div class="drawer-actions">
+    <a class="drawer-btn-open" id="drawerLink" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+      Bekijk bron
+    </a>
+    <button class="drawer-btn-close" id="drawerClose">Sluiten</button>
+  </div>
+</div>
 
 <!-- STAR DECORATION -->
 <svg class="star-deco" width="120" height="120" viewBox="0 0 120 120" fill="none">
@@ -749,14 +877,18 @@
           color: "#4fc3f7",
           title: "Functionele buikpijnklachten bij adolescenten in Nederland",
           meta: "NWO / Amsterdam UMC, 2022 — gepubliceerd in Gut",
-          url: "#"
+          url: "#",
+          explanation: "Dit is een vijfjarig cohortonderzoek onder 2.400 Nederlandse adolescenten. De onderzoekers volgden jongeren van 12 tot 18 jaar en registreerden alle huisartsbezoeken wegens maag- en darmklachten. Van de deelnemers bleek 8,3% chronische buikpijn te hebben die na uitgebreid onderzoek niet organisch verklaard kon worden. Het onderzoek is gepubliceerd in Gut, een van de meest gezaghebbende wetenschappelijke tijdschriften op het gebied van gastro-enterologie.",
+          relevance: "Dit onderzoek onderbouwt de openingsbewering van de reportage dat het gaat om een wijdverbreid probleem. Het geeft een concreet percentage en een betrouwbare onderzoeksbron, waardoor de claim niet enkel gebaseerd is op anekdotes van patiënten maar op systematisch verzamelde data."
         },
         {
           type: "Statistieken",
           color: "#81c784",
           title: "Zorgregistraties eerste lijn: maag-darmklachten jongeren 2018–2023",
           meta: "NIVEL Zorgregistraties, 2023",
-          url: "#"
+          url: "#",
+          explanation: "NIVEL (het Nederlands instituut voor onderzoek van de gezondheidszorg) houdt de geanonimiseerde registraties bij van meer dan 500 huisartsenpraktijken in Nederland. Deze dataset laat zien dat het aantal consultaties voor onverklaarde buikklachten bij jongeren tussen 2018 en 2023 met 34% is gestegen. De data zijn uitgesplitst naar leeftijd en geslacht.",
+          relevance: "De NIVEL-cijfers tonen dat het probleem groeit en niet stabiel is. Dit maakt de reportage actueel en laat zien dat de situatie verslechtert, wat de urgentie van het verhaal ondersteunt."
         }
       ]
     },
@@ -770,14 +902,18 @@
           color: "#ffb74d",
           title: "Fact check: Trump revives his lie that schools are secretly sending children for gender-affirming surgeries",
           meta: "CNN, augustus 2023",
-          url: "#"
+          url: "#",
+          explanation: "CNN's factcheckteam onderzocht de specifieke uitspraak van Trump door alle bekende gevallen in de VS te doorzoeken, schoolbesturen te bevragen en medische protocollen te raadplegen. Er werd geen enkel gedocumenteerd geval gevonden waarbij een school een minderjarige zonder medeweten van de ouders naar een geslachtsbevestigende ingreep heeft gestuurd. CNN kende de bewering het oordeel 'False' toe.",
+          relevance: "Deze factcheck is de directe tegenhanger van Trumps bewering. De reportage gebruikt dit om aan te tonen dat de politieke retoriek rond dit onderwerp losstaat van de medische realiteit, en dat beleidsmakers reageren op een probleem dat feitelijk niet bestaat zoals zij het beschrijven."
         },
         {
           type: "Officieel beleid",
           color: "#f48fb1",
           title: "WPATH Standards of Care v8 — vereiste ouderlijke toestemming",
           meta: "World Professional Association for Transgender Health, 2022",
-          url: "#"
+          url: "#",
+          explanation: "De WPATH Standards of Care versie 8 zijn de internationaal erkende richtlijnen voor genderzorg. Hoofdstuk 6 (over minderjarigen) stelt expliciet dat voor elke medische interventie — zowel puberteitsblokkeerders als chirurgische ingrepen — schriftelijke toestemming van ouders of wettelijke voogden vereist is. Scholen hebben in dit proces geen enkele rol.",
+          relevance: "Dit officiële beleidsdocument toont aan dat het systeem structureel zo is ingericht dat ouderlijke betrokkenheid verplicht is. Het weerlegt Trumps bewering niet alleen feitelijk, maar laat ook zien dat zelfs de meest progressieve medische richtlijnen deze toestemming als harde voorwaarde stellen."
         }
       ]
     },
@@ -791,14 +927,18 @@
           color: "#ce93d8",
           title: "Vergelijking behandelkosten bariatrische chirurgie EU",
           meta: "Zorginstituut Nederland, 2023",
-          url: "#"
+          url: "#",
+          explanation: "Het Zorginstituut Nederland heeft in 2023 de kosten van bariatrische ingrepen in zeven EU-landen vergeleken. Voor een gastric sleeve in Spanje liggen de all-in kosten (operatie, anesthesie, een overnachting, follow-up) tussen de €12.000 en €18.000. In Nederland valt dezelfde ingreep buiten de basisverzekering voor patiënten die niet voldoen aan de BMI-drempelwaarden, wat betekent dat er geen vergoeding is.",
+          relevance: "Dit rapport geeft de concrete financiële onderbouwing voor een van de centrale stellingen van de reportage: dat patiënten enorme bedragen betalen zonder enig vangnet. De combinatie van hoge kosten en geen vergoeding verklaart waarom gezinnen in financiële problemen komen."
         },
         {
           type: "Getuigenis",
           color: "#80cbc4",
           title: "Interview drie patiënten — anoniem, geverifieerd door redactie",
           meta: "NOS Nieuwsuur onderzoeksredactie, juli 2024",
-          url: "#"
+          url: "#",
+          explanation: "De NOS-redactie sprak uitgebreid met drie patiënten die een bariatrische ingreep in Spanje ondergingen. Hun identiteit is geverifieerd door de redactie maar ze zijn in de uitzending geanonimiseerd op hun eigen verzoek. De drie vrouwen betaalden respectievelijk €14.500, €15.800 en €17.200. Alle drie geven aan dat ze van tevoren onvoldoende zijn geïnformeerd over mogelijke complicaties.",
+          relevance: "De persoonlijke getuigenissen geven een menselijk gezicht aan de statistieken. Ze bevestigen de bevindingen uit het Zorginstituut-rapport en voegen toe dat informatie over risico's tekortschieten — een nieuw aspect dat de reportage verder uitdiept."
         }
       ]
     },
@@ -812,14 +952,18 @@
           color: "#4fc3f7",
           title: "Diagnostic delay in pediatric functional GI disorders: a Dutch cohort study",
           meta: "Erasmus MC / Maastricht UMC+, 2021",
-          url: "#"
+          url: "#",
+          explanation: "Dit cohortonderzoek volgde 340 Nederlandse kinderen en jongeren die uiteindelijk de diagnose functionele gastro-intestinale aandoening kregen. De onderzoekers berekenden de tijd tussen het eerste artsbezoek en de definitieve diagnose. De mediane diagnosevertraging bedroeg 4,2 jaar. Als oorzaken werden onder andere stigmatisering ('het zit tussen de oren'), gebrek aan specialistenverwijzingen en lange wachtlijsten bij kindermaag-darmleverspecia­listen aangewezen.",
+          relevance: "Dit onderzoek levert de harde cijfermatige basis voor een van de pijnlijkste bevindingen in de reportage. Vier jaar wachten op een diagnose verklaart waarom patiënten wanhopig genoeg worden om naar het buitenland te gaan — en soms voor drastische ingrepen te kiezen."
         },
         {
           type: "Expert interview",
           color: "#a5d6a7",
           title: "Dr. M. van den Berg (kinderarts MDL, MUMC+) — interview on record",
           meta: "NOS redactie, april 2024",
-          url: "#"
+          url: "#",
+          explanation: "Dr. Van den Berg is kinderarts-maag-darm-leverspecialist aan het Maastricht UMC+ en heeft meer dan 20 jaar ervaring met functionele buikklachten bij jongeren. In een on-record interview met de NOS-redactie beschreef zij drie systemische barrières: (1) huisartsen die functionele klachten te lang als psychosomatisch wegzetten, (2) verwijzingsdrempels die te hoog liggen, en (3) wachtlijsten bij MDL-kinderartsen die oplopen tot 14 maanden.",
+          relevance: "Het expertperspectief geeft medische autoriteit aan de bevinding uit het cohortonderzoek. Dr. Van den Berg verklaart niet alleen dát de vertraging bestaat, maar ook waarom — en dat maakt de reportage beleidsrelevant: er zijn aanwijsbare plekken in het systeem die gecorrigeerd kunnen worden."
         }
       ]
     },
@@ -833,14 +977,18 @@
           color: "#ffb74d",
           title: "Meta Advertentiebibliotheek: analyse 180+ advertenties bariatrische klinieken NL-doelgroep",
           meta: "NOS Data team, mei 2024 — methode beschikbaar",
-          url: "#"
+          url: "#",
+          explanation: "Het NOS Datateam gebruikte de publiek toegankelijke Meta Advertentiebibliotheek om alle actieve advertenties van Spaanse bariatrische klinieken te inventariseren die gericht waren op Nederland. In de periode januari–mei 2024 werden 182 unieke advertenties gevonden van 14 verschillende klinieken. De advertenties waren gericht op gebruikers van 13 jaar en ouder, met Nederlandse tekst en beelden die aansluiten bij de belevingswereld van tieners (sociale vergelijking, zelfvertrouwen, schoolleven). De gehanteerde methode is gepubliceerd op de NOS-website.",
+          relevance: "Deze data-analyse maakt iets concreet wat anders slechts als vermoeden bestond. Het bewijst dat de targeting van minderjarigen niet incidenteel is, maar een georganiseerde marketingstrategie. Dit is juridisch en ethisch relevant en roept vragen op over de handhaving van advertentieregels door Meta."
         },
         {
           type: "Screenshots",
           color: "#ef9a9a",
           title: "Gearchiveerde advertenties — 23 screenshots bewaard via Wayback Machine",
           meta: "NOS Stories redactie, 2024",
-          url: "#"
+          url: "#",
+          explanation: "Naast de kwantitatieve analyse heeft de redactie 23 individuele advertenties als screenshot gearchiveerd via de Wayback Machine van het Internet Archive. Dit is een gebruikelijke journalistieke methode om bewijs te bewaren van online content die snel kan verdwijnen. De screenshots tonen onder andere advertenties die expliciete voor-en-na-foto's gebruiken en teksten als 'Eindelijk jezelf voelen' in het Nederlands.",
+          relevance: "De gearchiveerde screenshots zijn het visuele bewijs dat de reportage kon tonen aan kijkers. Ze maken de abstracte cijfers uit de data-analyse tastbaar en geven de redactie een duurzaam, verifieerbaar bewijsstuk dat ook na het verwijderen van de advertenties beschikbaar blijft."
         }
       ]
     }
@@ -853,23 +1001,33 @@
   let activeClaim = 1; // start with claim at 34% active
 
   /* ── REFS ──────────────────────────────────────────────── */
-  const trackFill    = document.getElementById('trackFill');
-  const scrubThumb   = document.getElementById('scrubThumb');
-  const timestamp    = document.getElementById('timestamp');
-  const playOverlay  = document.getElementById('playOverlay');
-  const iconPlay     = document.getElementById('iconPlay');
-  const iconPause    = document.getElementById('iconPause');
-  const ctrlPlay     = document.getElementById('ctrlPlay');
-  const ctrlPause    = document.getElementById('ctrlPause');
-  const sourcePanel  = document.getElementById('sourcePanel');
-  const claimText    = document.getElementById('claimText');
-  const claimBadge   = document.getElementById('claimBadge');
-  const sourceBody   = document.getElementById('sourceBody');
-  const sourceClose  = document.getElementById('sourceClose');
-  const scrubArea    = document.getElementById('scrubArea');
-  const scrubTooltip = document.getElementById('scrubTooltip');
-  const playBtn      = document.getElementById('playBtn');
-  const playerWrap   = document.getElementById('playerWrap');
+  const trackFill       = document.getElementById('trackFill');
+  const scrubThumb      = document.getElementById('scrubThumb');
+  const timestamp       = document.getElementById('timestamp');
+  const playOverlay     = document.getElementById('playOverlay');
+  const iconPlay        = document.getElementById('iconPlay');
+  const iconPause       = document.getElementById('iconPause');
+  const ctrlPlay        = document.getElementById('ctrlPlay');
+  const ctrlPause       = document.getElementById('ctrlPause');
+  const sourcePanel     = document.getElementById('sourcePanel');
+  const claimText       = document.getElementById('claimText');
+  const claimBadge      = document.getElementById('claimBadge');
+  const sourceBody      = document.getElementById('sourceBody');
+  const sourceClose     = document.getElementById('sourceClose');
+  const scrubArea       = document.getElementById('scrubArea');
+  const scrubTooltip    = document.getElementById('scrubTooltip');
+  const playBtn         = document.getElementById('playBtn');
+  const playerWrap      = document.getElementById('playerWrap');
+  const drawerOverlay   = document.getElementById('drawerOverlay');
+  const sourceDrawer    = document.getElementById('sourceDrawer');
+  const drawerDot       = document.getElementById('drawerDot');
+  const drawerType      = document.getElementById('drawerType');
+  const drawerTitle     = document.getElementById('drawerTitle');
+  const drawerMeta      = document.getElementById('drawerMeta');
+  const drawerExpl      = document.getElementById('drawerExplanation');
+  const drawerRel       = document.getElementById('drawerRelevance');
+  const drawerLink      = document.getElementById('drawerLink');
+  const drawerClose     = document.getElementById('drawerClose');
 
   const TOTAL_SECS   = 642; // 10:42
 
@@ -919,17 +1077,26 @@
     claimBadge.textContent = `Bewering @ ${claim.time}`;
     claimText.textContent  = claim.text;
 
-    // build source items
-    sourceBody.innerHTML = claim.sources.map(s => `
-      <a class="source-item" href="${s.url}" target="_blank" rel="noopener">
+    // build source items as buttons (drawer opens on click)
+    sourceBody.innerHTML = claim.sources.map((s, si) => `
+      <button class="source-item" data-claim="${idx}" data-source="${si}" type="button">
         <div class="source-type">
           <div class="source-type-dot" style="background:${s.color}"></div>
           ${s.type}
         </div>
         <div class="source-title">${s.title}</div>
         <div class="source-meta">${s.meta}</div>
-      </a>
+      </button>
     `).join('');
+
+    // attach click handlers to newly created source buttons
+    sourceBody.querySelectorAll('.source-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ci = parseInt(btn.dataset.claim);
+        const si = parseInt(btn.dataset.source);
+        openDrawer(CLAIMS[ci].sources[si], btn);
+      });
+    });
 
     sourcePanel.classList.add('visible');
 
@@ -948,6 +1115,41 @@
       d.style.transform  = '';
     });
   }
+
+  /* ── DRAWER ────────────────────────────────────────────── */
+  let activeSourceBtn = null;
+
+  function openDrawer(source, triggerBtn) {
+    // highlight selected source item
+    if (activeSourceBtn) activeSourceBtn.classList.remove('selected');
+    activeSourceBtn = triggerBtn;
+    triggerBtn.classList.add('selected');
+
+    // set accent colour via CSS variable
+    sourceDrawer.style.setProperty('--drawer-accent', source.color);
+    drawerDot.style.background  = source.color;
+    drawerType.textContent       = source.type;
+    drawerTitle.textContent      = source.title;
+    drawerMeta.textContent       = source.meta;
+    drawerExpl.textContent       = source.explanation;
+    drawerRel.textContent        = source.relevance;
+    drawerLink.href              = source.url;
+
+    drawerOverlay.classList.add('open');
+    sourceDrawer.classList.add('open');
+  }
+
+  function closeDrawer() {
+    drawerOverlay.classList.remove('open');
+    sourceDrawer.classList.remove('open');
+    if (activeSourceBtn) {
+      activeSourceBtn.classList.remove('selected');
+      activeSourceBtn = null;
+    }
+  }
+
+  drawerClose.addEventListener('click', closeDrawer);
+  drawerOverlay.addEventListener('click', closeDrawer);
 
   /* ── EVENTS ────────────────────────────────────────────── */
 
@@ -998,7 +1200,7 @@
   // keyboard
   document.addEventListener('keydown', e => {
     if (e.key === ' ') { e.preventDefault(); setPlaying(!isPlaying); }
-    if (e.key === 'Escape') closeSource();
+    if (e.key === 'Escape') { closeDrawer(); closeSource(); }
   });
 
   /* ── INIT ──────────────────────────────────────────────── */
