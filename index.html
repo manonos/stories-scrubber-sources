@@ -576,53 +576,6 @@
       color: var(--paars-10);
     }
 
-    /* ── SURVEY CTA ──────────────────────────────────── */
-    .survey-block {
-      margin-top: 40px;
-      padding-top: 28px;
-      position: relative;
-    }
-    /* poederlijn, zoals de scheidingslijn op stories.nos.nl */
-    .survey-block::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: var(--paars-55);
-      box-shadow: 0 0 4px 1px rgba(138,105,247,.85);
-    }
-    .survey-question {
-      font-family: var(--font-head);
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 14px;
-      text-shadow: var(--text-shadow);
-    }
-    .btn-survey {
-      display: inline-flex; align-items: center;
-      flex-direction: row-reverse;
-      gap: 16px;
-      background: var(--roze-20);
-      color: var(--paars-10);
-      padding: 12px 12px 12px 24px;
-      border-radius: var(--pill);
-      font-family: var(--font-head);
-      font-size: 16px;
-      font-weight: 700;
-      border: none; cursor: pointer;
-      transition: background .3s;
-      text-decoration: none;
-    }
-    .btn-survey:hover { background: var(--roze-30); }
-    .btn-survey svg {
-      width: 32px; height: 32px;
-      padding: 8px;
-      background: rgba(31,0,95,.14);
-      border-radius: 50%;
-      fill: currentColor;
-      flex-shrink: 0;
-    }
-
     /* ── STAR DECO ───────────────────────────────────── */
     .star-deco {
       position: fixed;
@@ -976,17 +929,6 @@
       </div>
       <span class="next-title">Hoe deze VLIEGRAMP heel veel levens VERWOESTTE | Rewind…</span>
     </a>
-
-    <!-- SURVEY CTA -->
-    <div class="survey-block">
-      <p class="survey-question">Alles bekeken?</p>
-      <a class="btn-survey"
-         href="https://surveys.enalyzer.com?pid=k6n8f8te"
-         target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-        Naar de vragenlijst
-      </a>
-    </div>
   </div>
 
 </main>
