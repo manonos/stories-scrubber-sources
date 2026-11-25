@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOS Stories: Bronvermelding in video</title>
+  <title>NOS Stories: PoC bronvermelding</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -576,6 +576,21 @@
       color: var(--paars-10);
     }
 
+    /* ── DISCLAIMER ──────────────────────────────────── */
+    .disclaimer {
+      position: relative;
+      z-index: 10;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 0 40px 48px;
+    }
+    .disclaimer p {
+      font-size: 12px;
+      line-height: 1.5;
+      color: rgba(255,255,255,.65);
+      max-width: 780px;
+    }
+
     /* ── STAR DECO ───────────────────────────────────── */
     .star-deco {
       position: fixed;
@@ -753,12 +768,14 @@
         padding: 24px 24px 80px;
       }
       .topbar { padding: 16px 24px; }
+      .disclaimer { padding: 0 24px 40px; }
     }
     @media (max-width: 860px) {
       .topbar { padding: 16px; gap: 12px; }
       .topbar-right { gap: 12px; }
       .topbar-right a.icon-btn + a.icon-btn { margin-left: -12px; }
       .main { padding: 16px 16px 72px; }
+      .disclaimer { padding: 0 16px 32px; }
       .article-title { font-size: 24px; }
       .source-body { grid-template-columns: 1fr; }
       .source-header { flex-direction: column; gap: 10px; }
@@ -932,6 +949,11 @@
   </div>
 
 </main>
+
+<!-- DISCLAIMER -->
+<footer class="disclaimer">
+  <p>Alle inhoud op deze pagina is alleen bedoeld om mee te testen voor productverbetering en staat los van het werk van journalisten.</p>
+</footer>
 
 <!-- SOURCE DETAIL DRAWER -->
 <div class="source-drawer-overlay" id="drawerOverlay"></div>
